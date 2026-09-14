@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   :root{
     --bg:#1C2117;
@@ -257,7 +257,7 @@ async function loadCsv(url){
     renderAll();
     try{ await window.storage.set('hatchery-csv-url', url); }catch(e){}
   }catch(err){
-    setStatus('Failed to load: ' + err.message + ' — check the link is published as CSV and publicly viewable.', true);
+    setStatus('Failed to load CSV: ' + err.message + ' — check the link is published as CSV and publicly viewable.', true);
   }
 }
 
@@ -488,9 +488,17 @@ function renderBreakdownChart(rows){
 
 function renderLineOrBar(canvasId, type, data, isEmpty, stacked){
   const ctx = document.getElementById(canvasId);
-  if(charts[canvasId]) charts[canvasId].destroy();
+  if(charts[canvasId]){ charts[canvasId].destroy(); charts[canvasId]=null; }
+  if(typeof Chart === 'undefined'){
+    ctx.parentElement.querySelector('.chart-error')?.remove();
+    const msg = document.createElement('div');
+    msg.className = 'chart-error';
+    msg.style.cssText = 'color:#C15B3F;font-size:12px;padding:20px 0;';
+    msg.textContent = 'Chart library failed to load — try refreshing the page.';
+    ctx.parentElement.appendChild(msg);
+    return;
+  }
   if(isEmpty){
-    const parent = ctx.parentElement;
     return;
   }
   charts[canvasId] = new Chart(ctx, {
@@ -532,14 +540,18 @@ function renderTable(rows){
   table.innerHTML = html;
 }
 
+function safeRender(fn, rows){
+  try{ fn(rows); }catch(e){ console.error(e); }
+}
+
 function renderAll(){
   const rows = filteredRows();
-  renderKpis(rows);
-  renderTrendChart(rows);
-  renderStandardChart(rows);
-  renderCompositionChart(rows);
-  renderBreakdownChart(rows);
-  renderTable(rows);
+  safeRender(renderKpis, rows);
+  safeRender(renderTrendChart, rows);
+  safeRender(renderStandardChart, rows);
+  safeRender(renderCompositionChart, rows);
+  safeRender(renderBreakdownChart, rows);
+  safeRender(renderTable, rows);
 }
 
 document.getElementById('breakdownToggle').addEventListener('click', (e)=>{
