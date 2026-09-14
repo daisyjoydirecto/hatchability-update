@@ -415,19 +415,22 @@ function renderTrendChart(rows){
   const grouped = {};
   withDates.forEach(({d,r})=>{
     const key = d.toISOString().slice(0,10);
-    if(!grouped[key]) grouped[key]={hatch:[],clean:[]};
+    if(!grouped[key]) grouped[key]={hatch:[],clean:[],std:[]};
     grouped[key].hatch.push(getNum(r,'HATCHABILITY %'));
     grouped[key].clean.push(getNum(r,'CLEAN CHICKS %'));
+    grouped[key].std.push(getNum(r,'STD HATCHABILITY %'));
   });
   const labels = Object.keys(grouped).sort();
   const hatchData = labels.map(l=>avg(grouped[l].hatch));
   const cleanData = labels.map(l=>avg(grouped[l].clean));
+  const stdData = labels.map(l=>avg(grouped[l].std));
 
   renderLineOrBar('trendChart','line',{
     labels: labels.map(l=>new Date(l).toLocaleDateString(undefined,{month:'short',day:'numeric'})),
     datasets:[
       {label:'Hatchability %', data:hatchData, borderColor:'#6E7F2C', backgroundColor:'#6E7F2C', tension:.3, pointRadius:2},
       {label:'Clean chicks %', data:cleanData, borderColor:'#B3452F', backgroundColor:'#B3452F', tension:.3, pointRadius:2},
+      {label:'Breed standard %', data:stdData, borderColor:'#9A9C8E', backgroundColor:'#9A9C8E', borderDash:[5,4], tension:.3, pointRadius:0},
     ]
   }, labels.length===0);
 }
