@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hatchery Performance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#1C2117;
+    --surface:#262B1F;
+    --surface2:#2F3527;
+    --line:#3A4030;
+    --text:#F3EFE3;
+    --dim:#A7AD97;
+    --accent:#E4B84A;
+    --accent2:#7FA65C;
+    --warn:#C15B3F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,.num{font-family:'Fraunces',serif;}
+  .wrap{max-width:1280px;margin:0 auto;padding:36px 28px 80px;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:28px;flex-wrap:wrap;}
+  header h1{font-size:30px;font-weight:600;margin:0 0 4px;letter-spacing:.2px;}
+  header p{margin:0;color:var(--dim);font-size:14px;max-width:46ch;}
+  .meta{font-size:12px;color:var(--dim);text-align:right;}
+  .meta span{display:block;}
+
+  /* source bar */
+  .source-bar{
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;margin-bottom:22px;
+  }
+  .source-bar input[type=text]{
+    flex:1;min-width:220px;background:var(--bg);border:1px solid var(--line);
+    color:var(--text);padding:9px 12px;border-radius:7px;font-size:13px;font-family:'IBM Plex Mono',monospace;
+  }
+  .btn{
+    background:var(--accent);color:#221A0C;border:none;padding:9px 16px;border-radius:7px;
+    font-size:13px;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;
+  }
+  .btn.secondary{background:transparent;color:var(--text);border:1px solid var(--line);}
+  .btn:hover{filter:brightness(1.08);}
+  .status{font-size:12px;color:var(--dim);}
+  .status.err{color:var(--warn);}
+
+  /* filters */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;}
+  .filter{position:relative;}
+  .filter > button{
+    background:var(--surface);border:1px solid var(--line);color:var(--text);
+    padding:9px 14px;border-radius:20px;font-size:13px;cursor:pointer;
+    display:flex;align-items:center;gap:8px;font-family:'IBM Plex Sans',sans-serif;
+  }
+  .filter > button:hover{border-color:var(--accent);}
+  .filter .count{background:var(--accent);color:#221A0C;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;}
+  .filter-panel{
+    display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:20;
+    background:var(--surface2);border:1px solid var(--line);border-radius:10px;
+    padding:10px;min-width:200px;max-height:260px;overflow-y:auto;
+    box-shadow:0 12px 28px rgba(0,0,0,.35);
+  }
+  .filter.open .filter-panel{display:block;}
+  .filter-panel label{
+    display:flex;align-items:center;gap:8px;padding:6px 6px;font-size:13px;border-radius:6px;cursor:pointer;
+  }
+  .filter-panel label:hover{background:var(--bg);}
+  .filter-panel .fp-actions{display:flex;justify-content:space-between;padding:4px 6px 8px;border-bottom:1px solid var(--line);margin-bottom:6px;}
+  .filter-panel .fp-actions a{color:var(--accent2);font-size:11px;cursor:pointer;text-decoration:none;}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:28px;}
+  @media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr);}}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;}
+  .kpi .label{font-size:12px;color:var(--dim);margin-bottom:8px;}
+  .kpi .num{font-size:28px;font-weight:600;}
+  .kpi .sub{font-size:11px;margin-top:6px;color:var(--dim);}
+  .kpi .sub.good{color:var(--accent2);}
+  .kpi .sub.bad{color:var(--warn);}
+
+  /* charts */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px;}
+  @media(max-width:920px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;}
+  .card h2{font-size:16px;font-weight:600;margin:0 0 2px;}
+  .card .cardsub{font-size:12px;color:var(--dim);margin-bottom:14px;}
+  .card canvas{max-height:280px;}
+  .toggle-row{display:flex;gap:6px;margin-bottom:12px;}
+  .toggle-row button{
+    background:transparent;border:1px solid var(--line);color:var(--dim);
+    padding:5px 12px;border-radius:16px;font-size:12px;cursor:pointer;
+  }
+  .toggle-row button.active{background:var(--accent);border-color:var(--accent);color:#221A0C;font-weight:600;}
+
+  /* table */
+  .table-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;overflow:hidden;}
+  .table-scroll{overflow-x:auto;max-height:420px;overflow-y:auto;}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;white-space:nowrap;}
+  th{
+    position:sticky;top:0;background:var(--surface2);text-align:left;padding:9px 12px;
+    color:var(--dim);font-weight:600;font-size:11px;border-bottom:1px solid var(--line);
+  }
+  td{padding:8px 12px;border-bottom:1px solid var(--line);}
+  tr:hover td{background:var(--surface2);}
+  .pill{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+  .pill.good{background:rgba(127,166,92,.18);color:var(--accent2);}
+  .pill.bad{background:rgba(193,91,63,.18);color:var(--warn);}
+
+  .empty{color:var(--dim);font-size:13px;padding:40px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Hatchery Performance</h1>
+      <p>Hatchability and chick-quality monitoring across cycles, customers, farms and breeds.</p>
+    </div>
+    <div class="meta">
+      <span id="lastUpdated">No data loaded yet</span>
+      <span id="rowCount"></span>
+    </div>
+  </header>
+
+  <div class="source-bar">
+    <input id="csvUrl" type="text" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQhq9QzlZ8DgUdqqd2ZUzD_ZWAEh9xOz7T47Lw9i_rLhtKxB8YdXT1lDVeReoVbFi6kDuHvm8gsJ7si/pub?output=csv" placeholder="Paste your published Google Sheet CSV link (File → Share → Publish to web → CSV)">
+    <button class="btn" id="loadBtn">Load data</button>
+    <button class="btn secondary" id="refreshBtn">Refresh</button>
+    <span class="status" id="statusMsg"></span>
+  </div>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Hatchability &amp; clean chicks trend</h2>
+      <div class="cardsub">Averaged by hatch date across the current filter</div>
+      <canvas id="trendChart"></canvas>
+    </div>
+    <div class="card">
+      <h2>Actual vs. breed standard</h2>
+      <div class="cardsub">Average % per breed against its own standard</div>
+      <canvas id="standardChart"></canvas>
+    </div>
+    <div class="card">
+      <h2>Egg set composition</h2>
+      <div class="cardsub">By cycle — clean chicks, sellable, penoy, pips, waste</div>
+      <canvas id="compositionChart"></canvas>
+    </div>
+    <div class="card">
+      <h2>Performance breakdown</h2>
+      <div class="toggle-row" id="breakdownToggle">
+        <button data-key="CUSTOMERS" class="active">By customer</button>
+        <button data-key="FARM SOURCE">By farm</button>
+        <button data-key="BREED">By breed</button>
+      </div>
+      <div class="cardsub">Average hatchability % vs. breed standard</div>
+      <canvas id="breakdownChart"></canvas>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <h2 style="margin-bottom:14px;">Filtered records</h2>
+    <div class="table-scroll">
+      <table id="dataTable"></table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const FILTER_KEYS = ['CYCLE','CUSTOMERS','FARM SOURCE','BREED'];
+const FILTER_LABELS = {CYCLE:'Cycle', CUSTOMERS:'Customer', 'FARM SOURCE':'Farm', BREED:'Breed'};
+
+let rawRows = [];
+let colMap = {};
+let activeFilters = { CYCLE:new Set(), CUSTOMERS:new Set(), 'FARM SOURCE':new Set(), BREED:new Set() };
+let charts = {};
+let breakdownKey = 'CUSTOMERS';
+
+const COL_PATTERNS = {
+  CUSTOMERS: [/^customer/i],
+  'FARM SOURCE': [/farm/i],
+  CYCLE: [/^cycle/i],
+  BREED: [/^breed$/i],
+  AGE: [/^age/i],
+  'DATE SET': [/date\s*set/i],
+  'DATE HATCH': [/date\s*hatch/i],
+  'PRODUCTION DATE': [/production/i],
+  'STORAGE DAYS': [/storage/i],
+  'EGG SET': [/egg\s*set/i],
+  'CLEAN CHICKS': [/^clean\s*chicks$/i],
+  'CLEAN CHICKS %': [/clean\s*chicks\s*%/i],
+  'HATCH OF FERTILE': [/^hatch\s*of\s*fertile$/i],
+  'HATCHABILITY %': [/^hatchability\s*%/i],
+  'STD HATCH FERTILE %': [/breed\s*standard.*fertile/i],
+  'STD HATCHABILITY %': [/breed\s*standard.*hatchability/i],
+  'SELLABLE': [/sellable/i],
+  'PENOY 19': [/penoy\s*19/i],
+  'PENOY 21': [/penoy\s*21/i],
+  'PIPS': [/^pips/i],
+  'WASTE': [/^waste/i],
+};
+
+function buildColMap(headers){
+  const map = {};
+  Object.keys(COL_PATTERNS).forEach(key=>{
+    const pats = COL_PATTERNS[key];
+    const found = headers.find(h => pats.some(p=>p.test(h.trim())));
+    if(found) map[key]=found;
+  });
+  return map;
+}
+
+function num(v){
+  if(v===undefined||v===null) return NaN;
+  const cleaned = String(v).replace('%','').replace(/,/g,'').trim();
+  const n = parseFloat(cleaned);
+  return isNaN(n)?NaN:n;
+}
+
+function get(row,key){ return colMap[key] ? row[colMap[key]] : undefined; }
+function getNum(row,key){ return num(get(row,key)); }
+
+async function loadCsv(url){
+  setStatus('Loading…', false);
+  try{
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
+    if(parsed.errors && parsed.errors.length && !parsed.data.length){
+      throw new Error('Could not parse CSV');
+    }
+    const headers = parsed.meta.fields || [];
+    colMap = buildColMap(headers);
+    rawRows = parsed.data.filter(r => Object.values(r).some(v=>String(v).trim()!==''));
+    document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleString();
+    document.getElementById('rowCount').textContent = rawRows.length + ' records';
+    setStatus('Loaded ' + rawRows.length + ' rows', false);
+    activeFilters = { CYCLE:new Set(), CUSTOMERS:new Set(), 'FARM SOURCE':new Set(), BREED:new Set() };
+    renderFilters();
+    renderAll();
+    try{ await window.storage.set('hatchery-csv-url', url); }catch(e){}
+  }catch(err){
+    setStatus('Failed to load: ' + err.message + ' — check the link is published as CSV and publicly viewable.', true);
+  }
+}
+
+function setStatus(msg, isErr){
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.className = 'status' + (isErr?' err':'');
+}
+
+function uniqueValues(key){
+  const set = new Set();
+  rawRows.forEach(r=>{
+    const v = get(r,key);
+    if(v!==undefined && String(v).trim()!=='') set.add(String(v).trim());
+  });
+  return Array.from(set).sort();
+}
+
+function filteredRows(){
+  return rawRows.filter(r=>{
+    return FILTER_KEYS.every(key=>{
+      const set = activeFilters[key];
+      if(!set || set.size===0) return true;
+      const v = String(get(r,key)||'').trim();
+      return set.has(v);
+    });
+  });
+}
+
+function renderFilters(){
+  const container = document.getElementById('filters');
+  container.innerHTML = '';
+  FILTER_KEYS.forEach(key=>{
+    const values = uniqueValues(key);
+    const wrap = document.createElement('div');
+    wrap.className = 'filter';
+    wrap.id = 'filter-'+key.replace(/\s/g,'');
+
+    const btn = document.createElement('button');
+    const activeCount = activeFilters[key].size;
+    btn.innerHTML = FILTER_LABELS[key] + (activeCount ? ` <span class="count">${activeCount}</span>` : ' · All');
+    btn.onclick = (e)=>{
+      e.stopPropagation();
+      document.querySelectorAll('.filter').forEach(f=>{ if(f!==wrap) f.classList.remove('open'); });
+      wrap.classList.toggle('open');
+    };
+    wrap.appendChild(btn);
+
+    const panel = document.createElement('div');
+    panel.className = 'filter-panel';
+
+    const actions = document.createElement('div');
+    actions.className = 'fp-actions';
+    const clearA = document.createElement('a'); clearA.textContent='Clear';
+    clearA.onclick=()=>{ activeFilters[key].clear(); renderFilters(); renderAll(); };
+    const allA = document.createElement('a'); allA.textContent='Select all';
+    allA.onclick=()=>{ values.forEach(v=>activeFilters[key].add(v)); renderFilters(); renderAll(); };
+    actions.appendChild(clearA); actions.appendChild(allA);
+    panel.appendChild(actions);
+
+    values.forEach(v=>{
+      const label = document.createElement('label');
+      const cb = document.createElement('input');
+      cb.type='checkbox';
+      cb.checked = activeFilters[key].has(v);
+      cb.onchange = ()=>{
+        if(cb.checked) activeFilters[key].add(v); else activeFilters[key].delete(v);
+        renderFilters(); renderAll();
+      };
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(v));
+      panel.appendChild(label);
+    });
+
+    wrap.appendChild(panel);
+    container.appendChild(wrap);
+  });
+}
+
+document.addEventListener('click', ()=>{
+  document.querySelectorAll('.filter.open').forEach(f=>f.classList.remove('open'));
+});
+
+function avg(arr){ const c = arr.filter(v=>!isNaN(v)); return c.length ? c.reduce((a,b)=>a+b,0)/c.length : NaN; }
+function sum(arr){ return arr.filter(v=>!isNaN(v)).reduce((a,b)=>a+b,0); }
+function fmt1(n){ return isNaN(n) ? '—' : n.toFixed(1); }
+function fmtInt(n){ return isNaN(n) ? '—' : Math.round(n).toLocaleString(); }
+
+function renderKpis(rows){
+  const el = document.getElementById('kpis');
+  const eggSet = sum(rows.map(r=>getNum(r,'EGG SET')));
+  const cleanChicks = sum(rows.map(r=>getNum(r,'CLEAN CHICKS')));
+  const avgHatchability = avg(rows.map(r=>getNum(r,'HATCHABILITY %')));
+  const avgCleanPct = avg(rows.map(r=>getNum(r,'CLEAN CHICKS %')));
+  const avgStdHatch = avg(rows.map(r=>getNum(r,'STD HATCHABILITY %')));
+  const waste = sum(rows.map(r=>getNum(r,'WASTE')));
+  const delta = avgHatchability - avgStdHatch;
+
+  const kpiData = [
+    {label:'Total egg set', num: fmtInt(eggSet), sub:rows.length+' batches'},
+    {label:'Total clean chicks', num: fmtInt(cleanChicks), sub: isNaN(cleanChicks/eggSet)?'':fmt1(cleanChicks/eggSet*100)+'% of egg set'},
+    {label:'Avg hatchability', num: fmt1(avgHatchability)+'%', sub: isNaN(delta)?'':((delta>=0?'+':'')+fmt1(delta)+' pts vs standard'), cls: isNaN(delta)?'':(delta>=0?'good':'bad')},
+    {label:'Avg clean chicks %', num: fmt1(avgCleanPct)+'%', sub:'of fertile eggs'},
+    {label:'Total waste', num: fmtInt(waste), sub: isNaN(waste/eggSet)?'':fmt1(waste/eggSet*100)+'% of egg set'},
+  ];
+  el.innerHTML = kpiData.map(k=>`
+    <div class="kpi">
+      <div class="label">${k.label}</div>
+      <div class="num">${k.num}</div>
+      <div class="sub ${k.cls||''}">${k.sub||''}</div>
+    </div>`).join('');
+}
+
+const MONTH_NAMES = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+function parseDate(v){
+  if(!v) return null;
+  const s = String(v).trim();
+  if(!s) return null;
+  // Only trust native parsing when the string actually contains a 4-digit year —
+  // otherwise browsers guess inconsistently (or fail) on ambiguous formats.
+  if(/\d{4}/.test(s)){
+    const d = new Date(s);
+    if(!isNaN(d.getTime())) return d;
+  }
+  // "1-May" / "27-Apr" style (day-month, no year) — use a fixed placeholder year
+  // so same-season dates sort and group correctly. Real year isn't known.
+  let m = s.match(/^(\d{1,2})[-\/\s]([A-Za-z]{3,})$/);
+  if(m){
+    const mi = MONTH_NAMES.indexOf(m[2].toLowerCase().slice(0,3));
+    if(mi>=0) return new Date(2000, mi, parseInt(m[1],10));
+  }
+  m = s.match(/^([A-Za-z]{3,})[-\/\s](\d{1,2})$/);
+  if(m){
+    const mi = MONTH_NAMES.indexOf(m[1].toLowerCase().slice(0,3));
+    if(mi>=0) return new Date(2000, mi, parseInt(m[2],10));
+  }
+  return null;
+}
+
+function renderTrendChart(rows){
+  const withDates = rows.map(r=>({d:parseDate(get(r,'DATE HATCH')), r})).filter(x=>x.d);
+  withDates.sort((a,b)=>a.d-b.d);
+  const grouped = {};
+  withDates.forEach(({d,r})=>{
+    const key = d.toISOString().slice(0,10);
+    if(!grouped[key]) grouped[key]={hatch:[],clean:[]};
+    grouped[key].hatch.push(getNum(r,'HATCHABILITY %'));
+    grouped[key].clean.push(getNum(r,'CLEAN CHICKS %'));
+  });
+  const labels = Object.keys(grouped).sort();
+  const hatchData = labels.map(l=>avg(grouped[l].hatch));
+  const cleanData = labels.map(l=>avg(grouped[l].clean));
+
+  renderLineOrBar('trendChart','line',{
+    labels: labels.map(l=>new Date(l).toLocaleDateString(undefined,{month:'short',day:'numeric'})),
+    datasets:[
+      {label:'Hatchability %', data:hatchData, borderColor:'#E4B84A', backgroundColor:'#E4B84A', tension:.3, pointRadius:2},
+      {label:'Clean chicks %', data:cleanData, borderColor:'#7FA65C', backgroundColor:'#7FA65C', tension:.3, pointRadius:2},
+    ]
+  }, labels.length===0);
+}
+
+function renderStandardChart(rows){
+  const byBreed = {};
+  rows.forEach(r=>{
+    const b = get(r,'BREED') || 'Unknown';
+    if(!byBreed[b]) byBreed[b] = {hatch:[],std:[],fertile:[],stdFertile:[]};
+    byBreed[b].hatch.push(getNum(r,'HATCHABILITY %'));
+    byBreed[b].std.push(getNum(r,'STD HATCHABILITY %'));
+  });
+  const breeds = Object.keys(byBreed);
+  renderLineOrBar('standardChart','bar',{
+    labels: breeds,
+    datasets:[
+      {label:'Actual hatchability %', data:breeds.map(b=>avg(byBreed[b].hatch)), backgroundColor:'#E4B84A'},
+      {label:'Breed standard %', data:breeds.map(b=>avg(byBreed[b].std)), backgroundColor:'#3A4030'},
+    ]
+  }, breeds.length===0);
+}
+
+function renderCompositionChart(rows){
+  const byCycle = {};
+  rows.forEach(r=>{
+    const c = get(r,'CYCLE') || 'Unknown';
+    if(!byCycle[c]) byCycle[c] = {clean:0,sellable:0,p19:0,p21:0,pips:0,waste:0};
+    byCycle[c].clean += getNum(r,'CLEAN CHICKS')||0;
+    byCycle[c].sellable += getNum(r,'SELLABLE')||0;
+    byCycle[c].p19 += getNum(r,'PENOY 19')||0;
+    byCycle[c].p21 += getNum(r,'PENOY 21')||0;
+    byCycle[c].pips += getNum(r,'PIPS')||0;
+    byCycle[c].waste += getNum(r,'WASTE')||0;
+  });
+  const cycles = Object.keys(byCycle);
+  const seriesDefs = [
+    ['Clean chicks','clean','#E4B84A'],
+    ['Sellable B/C/Reject','sellable','#7FA65C'],
+    ['Penoy 19','p19','#5B7A9A'],
+    ['Penoy 21','p21','#8A6BB0'],
+    ['Pips','pips','#B0A15A'],
+    ['Waste','waste','#C15B3F'],
+  ];
+  renderLineOrBar('compositionChart','bar',{
+    labels: cycles,
+    datasets: seriesDefs.map(([label,key,color])=>({
+      label, data: cycles.map(c=>byCycle[c][key]), backgroundColor:color, stack:'s'
+    }))
+  }, cycles.length===0, true);
+}
+
+function renderBreakdownChart(rows){
+  const key = breakdownKey;
+  const groups = {};
+  rows.forEach(r=>{
+    const g = get(r,key) || 'Unknown';
+    if(!groups[g]) groups[g] = {hatch:[],std:[]};
+    groups[g].hatch.push(getNum(r,'HATCHABILITY %'));
+    groups[g].std.push(getNum(r,'STD HATCHABILITY %'));
+  });
+  const labels = Object.keys(groups);
+  renderLineOrBar('breakdownChart','bar',{
+    labels,
+    datasets:[
+      {label:'Avg hatchability %', data:labels.map(l=>avg(groups[l].hatch)), backgroundColor:'#E4B84A'},
+      {label:'Breed standard %', data:labels.map(l=>avg(groups[l].std)), backgroundColor:'#3A4030'},
+    ]
+  }, labels.length===0);
+}
+
+function renderLineOrBar(canvasId, type, data, isEmpty, stacked){
+  const ctx = document.getElementById(canvasId);
+  if(charts[canvasId]) charts[canvasId].destroy();
+  if(isEmpty){
+    const parent = ctx.parentElement;
+    return;
+  }
+  charts[canvasId] = new Chart(ctx, {
+    type,
+    data,
+    options:{
+      responsive:true,
+      maintainAspectRatio:true,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{labels:{color:'#A7AD97',font:{family:'IBM Plex Sans',size:11}}},
+      },
+      scales:{
+        x:{ stacked: !!stacked, ticks:{color:'#A7AD97',font:{size:10}}, grid:{color:'#3A4030'} },
+        y:{ stacked: !!stacked, ticks:{color:'#A7AD97',font:{size:10}}, grid:{color:'#3A4030'} },
+      }
+    }
+  });
+}
+
+function renderTable(rows){
+  const table = document.getElementById('dataTable');
+  if(!rows.length){ table.innerHTML = '<tr><td class="empty">No records match the current filters.</td></tr>'; return; }
+  const cols = ['CUSTOMERS','FARM SOURCE','CYCLE','BREED','DATE HATCH','EGG SET','CLEAN CHICKS','CLEAN CHICKS %','HATCHABILITY %','STD HATCHABILITY %','WASTE'];
+  let html = '<thead><tr>' + cols.map(c=>`<th>${FILTER_LABELS[c]||c}</th>`).join('') + '</tr></thead><tbody>';
+  rows.slice(0,300).forEach(r=>{
+    html += '<tr>' + cols.map(c=>{
+      if(c==='HATCHABILITY %'){
+        const v = getNum(r,c); const std = getNum(r,'STD HATCHABILITY %');
+        const cls = (!isNaN(v)&&!isNaN(std)) ? (v>=std?'good':'bad') : '';
+        return `<td>${cls?`<span class="pill ${cls}">${fmt1(v)}%</span>`:(isNaN(v)?'—':fmt1(v)+'%')}</td>`;
+      }
+      if(c==='CLEAN CHICKS %') return `<td>${isNaN(getNum(r,c))?'—':fmt1(getNum(r,c))+'%'}</td>`;
+      if(c==='STD HATCHABILITY %') return `<td>${isNaN(getNum(r,c))?'—':fmt1(getNum(r,c))+'%'}</td>`;
+      return `<td>${get(r,c)!==undefined ? get(r,c) : '—'}</td>`;
+    }).join('') + '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function renderAll(){
+  const rows = filteredRows();
+  renderKpis(rows);
+  renderTrendChart(rows);
+  renderStandardChart(rows);
+  renderCompositionChart(rows);
+  renderBreakdownChart(rows);
+  renderTable(rows);
+}
+
+document.getElementById('breakdownToggle').addEventListener('click', (e)=>{
+  if(e.target.tagName!=='BUTTON') return;
+  document.querySelectorAll('#breakdownToggle button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  breakdownKey = e.target.dataset.key;
+  renderBreakdownChart(filteredRows());
+});
+
+document.getElementById('loadBtn').addEventListener('click', ()=>{
+  const url = document.getElementById('csvUrl').value.trim();
+  if(!url){ setStatus('Paste your published CSV link first', true); return; }
+  loadCsv(url);
+});
+document.getElementById('refreshBtn').addEventListener('click', ()=>{
+  const url = document.getElementById('csvUrl').value.trim();
+  if(!url){ setStatus('Load a data source first', true); return; }
+  loadCsv(url + (url.includes('?')?'&':'?') + '_ts=' + Date.now());
+});
+
+(async function init(){
+  try{
+    const saved = await window.storage.get('hatchery-csv-url');
+    if(saved && saved.value){
+      document.getElementById('csvUrl').value = saved.value;
+      loadCsv(saved.value);
+      return;
+    }
+  }catch(e){}
+  const prefilled = document.getElementById('csvUrl').value.trim();
+  if(prefilled){ loadCsv(prefilled); return; }
+  setStatus('Paste your published Google Sheet CSV link above to get started', false);
+})();
+</script>
+</body>
+</html>
