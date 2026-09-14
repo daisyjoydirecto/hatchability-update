@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Hatching Eggs and Hatchery Performance</title>
+<title>Hatchery Performance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -131,11 +131,11 @@
 <body>
 <div class="topbar">
   <div class="topbar-inner">
-    <div class="eyebrow">M. Montesclaros Farms Inc. — HE to Day-Old-Chicks Operations</div>
+    <div class="eyebrow">M. Montesclaros Farms Inc. — Hatchery Operations</div>
     <header>
       <div>
-        <h1>Hatchability Performance</h1>
-        <p>Hatchability and chick-quality monitoring across cycles,customers,farms and breeds.</p>
+        <h1>Hatchery Performance</h1>
+        <p>Hatchability and chick-quality monitoring across cycles, customers, farms and breeds.</p>
       </div>
       <div class="meta">
         <span><span class="dot"></span><span id="lastUpdated">No data loaded yet</span></span>
@@ -428,9 +428,9 @@ function renderTrendChart(rows){
   renderLineOrBar('trendChart','line',{
     labels: labels.map(l=>new Date(l).toLocaleDateString(undefined,{month:'short',day:'numeric'})),
     datasets:[
-      {label:'Hatchability %', data:hatchData, borderColor:'#6E7F2C', backgroundColor:'#6E7F2C', tension:.3, pointRadius:2},
-      {label:'Clean chicks %', data:cleanData, borderColor:'#B3452F', backgroundColor:'#B3452F', tension:.3, pointRadius:2},
-      {label:'Breed standard %', data:stdData, borderColor:'#9A9C8E', backgroundColor:'#9A9C8E', borderDash:[5,4], tension:.3, pointRadius:0},
+      {label:'Hatchability %', data:hatchData, borderColor:'#6B6F62', backgroundColor:'#6B6F62', tension:.3, pointRadius:2},
+      {label:'Clean chicks %', data:cleanData, borderColor:'#4B8A3F', backgroundColor:'#4B8A3F', tension:.3, pointRadius:2},
+      {label:'Breed standard %', data:stdData, borderColor:'#2E6BB3', backgroundColor:'#2E6BB3', borderDash:[5,4], tension:.3, pointRadius:0},
     ]
   }, labels.length===0);
 }
