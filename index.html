@@ -9,15 +9,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   :root{
-    --bg:#1C2117;
-    --surface:#262B1F;
-    --surface2:#2F3527;
-    --line:#3A4030;
-    --text:#F3EFE3;
-    --dim:#A7AD97;
-    --accent:#E4B84A;
-    --accent2:#7FA65C;
-    --warn:#C15B3F;
+    --header-bg:#111310;
+    --header-line:#6E7F2C;
+    --bg:#F5F5F1;
+    --surface:#FFFFFF;
+    --surface2:#F0F0EA;
+    --line:#E1E2D9;
+    --text:#1A1B16;
+    --dim:#6B6F62;
+    --accent:#6E7F2C;
+    --accent-dark:#4B5A1F;
+    --accent2:#4B5A1F;
+    --warn:#B3452F;
   }
   *{box-sizing:border-box;}
   body{
@@ -28,83 +31,87 @@
     -webkit-font-smoothing:antialiased;
   }
   h1,h2,.num{font-family:'Fraunces',serif;}
-  .wrap{max-width:1280px;margin:0 auto;padding:36px 28px 80px;}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 28px 80px;}
 
-  header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:28px;flex-wrap:wrap;}
-  header h1{font-size:30px;font-weight:600;margin:0 0 4px;letter-spacing:.2px;}
-  header p{margin:0;color:var(--dim);font-size:14px;max-width:46ch;}
-  .meta{font-size:12px;color:var(--dim);text-align:right;}
-  .meta span{display:block;}
+  .topbar{background:var(--header-bg);border-bottom:4px solid var(--header-line);margin-bottom:28px;}
+  .topbar-inner{max-width:1280px;margin:0 auto;padding:22px 28px 20px;}
+  .eyebrow{
+    color:var(--header-line);font-size:11px;letter-spacing:1px;text-transform:uppercase;
+    font-weight:600;margin-bottom:10px;font-family:'IBM Plex Sans',sans-serif;
+  }
+  header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;}
+  header h1{font-size:28px;font-weight:600;margin:0 0 4px;letter-spacing:.2px;color:#FFFFFF;}
+  header p{margin:0;color:#B7BBA9;font-size:14px;max-width:46ch;}
+  .meta{font-size:12px;color:#B7BBA9;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .meta .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:6px;}
 
   /* source bar */
   .source-bar{
     display:flex;gap:10px;align-items:center;flex-wrap:wrap;
-    background:var(--surface);border:1px solid var(--line);border-radius:10px;
-    padding:12px 14px;margin-bottom:22px;
   }
   .source-bar input[type=text]{
     flex:1;min-width:220px;background:var(--bg);border:1px solid var(--line);
     color:var(--text);padding:9px 12px;border-radius:7px;font-size:13px;font-family:'IBM Plex Mono',monospace;
   }
   .btn{
-    background:var(--accent);color:#221A0C;border:none;padding:9px 16px;border-radius:7px;
+    background:var(--accent-dark);color:#FFFFFF;border:1px solid var(--accent-dark);padding:8px 16px;border-radius:6px;
     font-size:13px;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;
   }
-  .btn.secondary{background:transparent;color:var(--text);border:1px solid var(--line);}
-  .btn:hover{filter:brightness(1.08);}
-  .status{font-size:12px;color:var(--dim);}
-  .status.err{color:var(--warn);}
+  .btn.secondary{background:transparent;color:#FFFFFF;border:1px solid #454A3C;}
+  .btn:hover{filter:brightness(1.15);}
+  .status{font-size:12px;color:#B7BBA9;}
+  .status.err{color:#E08064;}
 
   /* filters */
   .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;}
   .filter{position:relative;}
   .filter > button{
-    background:var(--surface);border:1px solid var(--line);color:var(--text);
-    padding:9px 14px;border-radius:20px;font-size:13px;cursor:pointer;
+    background:var(--surface);border:1px solid var(--accent);color:var(--accent-dark);
+    padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;font-weight:500;
     display:flex;align-items:center;gap:8px;font-family:'IBM Plex Sans',sans-serif;
   }
-  .filter > button:hover{border-color:var(--accent);}
-  .filter .count{background:var(--accent);color:#221A0C;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;}
+  .filter > button:hover{background:var(--surface2);}
+  .filter .count{background:var(--accent-dark);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;}
   .filter-panel{
     display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:20;
-    background:var(--surface2);border:1px solid var(--line);border-radius:10px;
+    background:var(--surface);border:1px solid var(--line);border-radius:10px;
     padding:10px;min-width:200px;max-height:260px;overflow-y:auto;
-    box-shadow:0 12px 28px rgba(0,0,0,.35);
+    box-shadow:0 12px 28px rgba(0,0,0,.15);
   }
   .filter.open .filter-panel{display:block;}
   .filter-panel label{
     display:flex;align-items:center;gap:8px;padding:6px 6px;font-size:13px;border-radius:6px;cursor:pointer;
   }
-  .filter-panel label:hover{background:var(--bg);}
+  .filter-panel label:hover{background:var(--surface2);}
   .filter-panel .fp-actions{display:flex;justify-content:space-between;padding:4px 6px 8px;border-bottom:1px solid var(--line);margin-bottom:6px;}
-  .filter-panel .fp-actions a{color:var(--accent2);font-size:11px;cursor:pointer;text-decoration:none;}
+  .filter-panel .fp-actions a{color:var(--accent-dark);font-size:11px;cursor:pointer;text-decoration:none;font-weight:600;}
 
   /* KPIs */
   .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:28px;}
   @media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr);}}
-  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;}
-  .kpi .label{font-size:12px;color:var(--dim);margin-bottom:8px;}
-  .kpi .num{font-size:28px;font-weight:600;}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;border-top:3px solid var(--accent);}
+  .kpi .label{font-size:11px;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px;}
+  .kpi .num{font-size:28px;font-weight:600;color:var(--text);}
   .kpi .sub{font-size:11px;margin-top:6px;color:var(--dim);}
-  .kpi .sub.good{color:var(--accent2);}
+  .kpi .sub.good{color:var(--accent-dark);}
   .kpi .sub.bad{color:var(--warn);}
 
   /* charts */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px;}
   @media(max-width:920px){.grid{grid-template-columns:1fr;}}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;}
-  .card h2{font-size:16px;font-weight:600;margin:0 0 2px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;}
+  .card h2{font-size:16px;font-weight:600;margin:0 0 2px;color:var(--text);}
   .card .cardsub{font-size:12px;color:var(--dim);margin-bottom:14px;}
   .card canvas{max-height:280px;}
   .toggle-row{display:flex;gap:6px;margin-bottom:12px;}
   .toggle-row button{
-    background:transparent;border:1px solid var(--line);color:var(--dim);
-    padding:5px 12px;border-radius:16px;font-size:12px;cursor:pointer;
+    background:var(--surface);border:1px solid var(--accent);color:var(--accent-dark);
+    padding:5px 12px;border-radius:16px;font-size:12px;cursor:pointer;font-weight:500;
   }
-  .toggle-row button.active{background:var(--accent);border-color:var(--accent);color:#221A0C;font-weight:600;}
+  .toggle-row button.active{background:var(--accent-dark);border-color:var(--accent-dark);color:#fff;font-weight:600;}
 
   /* table */
-  .table-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;overflow:hidden;}
+  .table-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;overflow:hidden;}
   .table-scroll{overflow-x:auto;max-height:420px;overflow-y:auto;}
   table{border-collapse:collapse;width:100%;font-size:12.5px;white-space:nowrap;}
   th{
@@ -114,32 +121,37 @@
   td{padding:8px 12px;border-bottom:1px solid var(--line);}
   tr:hover td{background:var(--surface2);}
   .pill{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
-  .pill.good{background:rgba(127,166,92,.18);color:var(--accent2);}
-  .pill.bad{background:rgba(193,91,63,.18);color:var(--warn);}
+  .pill.good{background:rgba(75,90,31,.12);color:var(--accent-dark);}
+  .pill.bad{background:rgba(179,69,47,.12);color:var(--warn);}
 
   .empty{color:var(--dim);font-size:13px;padding:40px;text-align:center;}
+  .hidden{display:none !important;}
 </style>
 </head>
 <body>
-<div class="wrap">
-
-  <header>
-    <div>
-      <h1>Hatchery Performance</h1>
-      <p>Hatchability and chick-quality monitoring across cycles, customers, farms and breeds.</p>
-    </div>
-    <div class="meta">
-      <span id="lastUpdated">No data loaded yet</span>
-      <span id="rowCount"></span>
-    </div>
-  </header>
-
-  <div class="source-bar">
-    <input id="csvUrl" type="text" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQhq9QzlZ8DgUdqqd2ZUzD_ZWAEh9xOz7T47Lw9i_rLhtKxB8YdXT1lDVeReoVbFi6kDuHvm8gsJ7si/pub?output=csv" placeholder="Paste your published Google Sheet CSV link (File → Share → Publish to web → CSV)">
-    <button class="btn" id="loadBtn">Load data</button>
-    <button class="btn secondary" id="refreshBtn">Refresh</button>
-    <span class="status" id="statusMsg"></span>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="eyebrow">M. Montesclaros Farms Inc. — Hatchery Operations</div>
+    <header>
+      <div>
+        <h1>Hatchery Performance</h1>
+        <p>Hatchability and chick-quality monitoring across cycles, customers, farms and breeds.</p>
+      </div>
+      <div class="meta">
+        <span><span class="dot"></span><span id="lastUpdated">No data loaded yet</span></span>
+        <span id="rowCount"></span>
+        <div class="source-bar">
+          <input id="csvUrl" type="text" class="hidden" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQhq9QzlZ8DgUdqqd2ZUzD_ZWAEh9xOz7T47Lw9i_rLhtKxB8YdXT1lDVeReoVbFi6kDuHvm8gsJ7si/pub?output=csv">
+          <button class="btn" id="loadBtn">Load data</button>
+          <button class="btn secondary" id="refreshBtn">Refresh</button>
+        </div>
+      </div>
+    </header>
+    <div class="status" id="statusMsg" style="margin-top:8px;"></div>
   </div>
+</div>
+
+<div class="wrap">
 
   <div class="filters" id="filters"></div>
 
@@ -414,8 +426,8 @@ function renderTrendChart(rows){
   renderLineOrBar('trendChart','line',{
     labels: labels.map(l=>new Date(l).toLocaleDateString(undefined,{month:'short',day:'numeric'})),
     datasets:[
-      {label:'Hatchability %', data:hatchData, borderColor:'#E4B84A', backgroundColor:'#E4B84A', tension:.3, pointRadius:2},
-      {label:'Clean chicks %', data:cleanData, borderColor:'#7FA65C', backgroundColor:'#7FA65C', tension:.3, pointRadius:2},
+      {label:'Hatchability %', data:hatchData, borderColor:'#6E7F2C', backgroundColor:'#6E7F2C', tension:.3, pointRadius:2},
+      {label:'Clean chicks %', data:cleanData, borderColor:'#B3452F', backgroundColor:'#B3452F', tension:.3, pointRadius:2},
     ]
   }, labels.length===0);
 }
@@ -432,8 +444,8 @@ function renderStandardChart(rows){
   renderLineOrBar('standardChart','bar',{
     labels: breeds,
     datasets:[
-      {label:'Actual hatchability %', data:breeds.map(b=>avg(byBreed[b].hatch)), backgroundColor:'#E4B84A'},
-      {label:'Breed standard %', data:breeds.map(b=>avg(byBreed[b].std)), backgroundColor:'#3A4030'},
+      {label:'Actual hatchability %', data:breeds.map(b=>avg(byBreed[b].hatch)), backgroundColor:'#6E7F2C'},
+      {label:'Breed standard %', data:breeds.map(b=>avg(byBreed[b].std)), backgroundColor:'#C4C6B8'},
     ]
   }, breeds.length===0);
 }
@@ -452,12 +464,12 @@ function renderCompositionChart(rows){
   });
   const cycles = Object.keys(byCycle);
   const seriesDefs = [
-    ['Clean chicks','clean','#E4B84A'],
-    ['Sellable B/C/Reject','sellable','#7FA65C'],
-    ['Penoy 19','p19','#5B7A9A'],
-    ['Penoy 21','p21','#8A6BB0'],
-    ['Pips','pips','#B0A15A'],
-    ['Waste','waste','#C15B3F'],
+    ['Clean chicks','clean','#6E7F2C'],
+    ['Sellable B/C/Reject','sellable','#4B5A1F'],
+    ['Penoy 19','p19','#9AA46B'],
+    ['Penoy 21','p21','#C4C6B8'],
+    ['Pips','pips','#D8B24A'],
+    ['Waste','waste','#B3452F'],
   ];
   renderLineOrBar('compositionChart','bar',{
     labels: cycles,
@@ -480,8 +492,8 @@ function renderBreakdownChart(rows){
   renderLineOrBar('breakdownChart','bar',{
     labels,
     datasets:[
-      {label:'Avg hatchability %', data:labels.map(l=>avg(groups[l].hatch)), backgroundColor:'#E4B84A'},
-      {label:'Breed standard %', data:labels.map(l=>avg(groups[l].std)), backgroundColor:'#3A4030'},
+      {label:'Avg hatchability %', data:labels.map(l=>avg(groups[l].hatch)), backgroundColor:'#6E7F2C'},
+      {label:'Breed standard %', data:labels.map(l=>avg(groups[l].std)), backgroundColor:'#C4C6B8'},
     ]
   }, labels.length===0);
 }
@@ -493,7 +505,7 @@ function renderLineOrBar(canvasId, type, data, isEmpty, stacked){
     ctx.parentElement.querySelector('.chart-error')?.remove();
     const msg = document.createElement('div');
     msg.className = 'chart-error';
-    msg.style.cssText = 'color:#C15B3F;font-size:12px;padding:20px 0;';
+    msg.style.cssText = 'color:#B3452F;font-size:12px;padding:20px 0;';
     msg.textContent = 'Chart library failed to load — try refreshing the page.';
     ctx.parentElement.appendChild(msg);
     return;
@@ -509,11 +521,11 @@ function renderLineOrBar(canvasId, type, data, isEmpty, stacked){
       maintainAspectRatio:true,
       interaction:{mode:'index',intersect:false},
       plugins:{
-        legend:{labels:{color:'#A7AD97',font:{family:'IBM Plex Sans',size:11}}},
+        legend:{labels:{color:'#6B6F62',font:{family:'IBM Plex Sans',size:11}}},
       },
       scales:{
-        x:{ stacked: !!stacked, ticks:{color:'#A7AD97',font:{size:10}}, grid:{color:'#3A4030'} },
-        y:{ stacked: !!stacked, ticks:{color:'#A7AD97',font:{size:10}}, grid:{color:'#3A4030'} },
+        x:{ stacked: !!stacked, ticks:{color:'#6B6F62',font:{size:10}}, grid:{color:'#E1E2D9'} },
+        y:{ stacked: !!stacked, ticks:{color:'#6B6F62',font:{size:10}}, grid:{color:'#E1E2D9'} },
       }
     }
   });
