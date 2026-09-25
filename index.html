@@ -31,51 +31,56 @@
     -webkit-font-smoothing:antialiased;
   }
   h1,h2,.num{font-family:'Fraunces',serif;}
-  .wrap{max-width:1280px;margin:0 auto;padding:0 28px 80px;}
+  .wrap{max-width:1400px;margin:0 auto;padding:0 28px 80px;}
 
-  .topbar{background:var(--header-bg);border-bottom:4px solid var(--header-line);margin-bottom:28px;}
-  .topbar-inner{max-width:1280px;margin:0 auto;padding:22px 28px 20px;}
+  /* header */
+  .topbar{background:var(--header-bg);border-bottom:3px solid var(--header-line);margin-bottom:22px;}
+  .topbar-inner{
+    max-width:1400px;margin:0 auto;padding:12px 28px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
   .eyebrow{
-    color:var(--header-line);font-size:11px;letter-spacing:1px;text-transform:uppercase;
-    font-weight:600;margin-bottom:10px;font-family:'IBM Plex Sans',sans-serif;
+    color:var(--header-line);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+    font-weight:600;font-family:'IBM Plex Sans',sans-serif;white-space:nowrap;
   }
-  header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;}
-  header h1{font-size:28px;font-weight:600;margin:0 0 4px;letter-spacing:.2px;color:#FFFFFF;}
-  header p{margin:0;color:#B7BBA9;font-size:14px;max-width:46ch;}
-  .meta{font-size:12px;color:#B7BBA9;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-  .meta .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:6px;}
+  .hdiv{width:1px;height:18px;background:#3A3D33;}
+  .topbar h1{font-size:18px;font-weight:600;margin:0;letter-spacing:.2px;color:#FFFFFF;white-space:nowrap;}
+  .live{font-size:12.5px;color:#B7BBA9;display:flex;align-items:center;gap:8px;white-space:nowrap;}
+  .live .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;box-shadow:0 0 0 3px rgba(110,127,44,.25);}
+  .topbar-spacer{flex:1;}
+  .topbar-actions{display:flex;gap:10px;align-items:center;}
 
-  /* source bar */
-  .source-bar{
-    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
-  }
-  .source-bar input[type=text]{
-    flex:1;min-width:220px;background:var(--bg);border:1px solid var(--line);
-    color:var(--text);padding:9px 12px;border-radius:7px;font-size:13px;font-family:'IBM Plex Mono',monospace;
-  }
   .btn{
     background:var(--accent-dark);color:#FFFFFF;border:1px solid var(--accent-dark);padding:8px 16px;border-radius:6px;
-    font-size:13px;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;
+    font-size:13px;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;white-space:nowrap;
   }
-  .btn.secondary{background:transparent;color:#FFFFFF;border:1px solid #454A3C;}
+  .btn.outline{background:transparent;color:var(--header-line);border:1px solid var(--header-line);}
   .btn:hover{filter:brightness(1.15);}
-  .status{font-size:12px;color:#B7BBA9;}
+  .status{font-size:12px;color:#B7BBA9;padding:2px 28px 12px;}
   .status.err{color:#E08064;}
+  .hidden{display:none !important;}
 
-  /* filters */
-  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;}
+  /* filter bar */
+  .filterbar{
+    display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;
+    padding:18px 0 14px;
+  }
+  .filter-field{display:flex;flex-direction:column;gap:6px;min-width:180px;}
+  .filter-field > .fname{font-size:12px;color:var(--dim);}
   .filter{position:relative;}
   .filter > button{
-    background:var(--surface);border:1px solid var(--accent);color:var(--accent-dark);
-    padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;font-weight:500;
-    display:flex;align-items:center;gap:8px;font-family:'IBM Plex Sans',sans-serif;
+    background:var(--surface);border:1px solid var(--line);color:var(--text);
+    padding:9px 12px;border-radius:7px;font-size:13px;cursor:pointer;font-weight:500;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:180px;
+    font-family:'IBM Plex Sans',sans-serif;
   }
-  .filter > button:hover{background:var(--surface2);}
+  .filter > button:after{content:'▾';color:var(--dim);font-size:11px;}
+  .filter > button:hover{border-color:var(--accent);}
   .filter .count{background:var(--accent-dark);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;}
   .filter-panel{
     display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:20;
     background:var(--surface);border:1px solid var(--line);border-radius:10px;
-    padding:10px;min-width:200px;max-height:260px;overflow-y:auto;
+    padding:10px;min-width:220px;max-height:260px;overflow-y:auto;
     box-shadow:0 12px 28px rgba(0,0,0,.15);
   }
   .filter.open .filter-panel{display:block;}
@@ -85,24 +90,48 @@
   .filter-panel label:hover{background:var(--surface2);}
   .filter-panel .fp-actions{display:flex;justify-content:space-between;padding:4px 6px 8px;border-bottom:1px solid var(--line);margin-bottom:6px;}
   .filter-panel .fp-actions a{color:var(--accent-dark);font-size:11px;cursor:pointer;text-decoration:none;font-weight:600;}
+  .clear-filters{margin-left:auto;}
+  .filter-summary{font-size:12.5px;color:var(--dim);padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:22px;}
 
   /* KPIs */
-  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:28px;}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:26px;}
   @media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr);}}
-  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;border-top:3px solid var(--accent);}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;}
+  .kpi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
   .kpi .label{font-size:11px;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px;}
-  .kpi .num{font-size:28px;font-weight:600;color:var(--text);}
+  .kpi .num{font-size:26px;font-weight:600;color:var(--text);}
   .kpi .sub{font-size:11px;margin-top:6px;color:var(--dim);}
   .kpi .sub.good{color:var(--accent-dark);}
   .kpi .sub.bad{color:var(--warn);}
+  .kpi-pill{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:10px;white-space:nowrap;}
+  .kpi-pill.good{background:rgba(75,90,31,.12);color:var(--accent-dark);}
+  .kpi-pill.bad{background:rgba(179,69,47,.12);color:var(--warn);}
+  .kpi-bar{position:relative;height:5px;border-radius:3px;background:var(--surface2);margin-top:12px;overflow:visible;}
+  .kpi-bar .fill{position:absolute;left:0;top:0;height:100%;border-radius:3px;background:var(--accent-dark);}
+  .kpi-bar.bad .fill{background:var(--warn);}
+  .kpi-bar .tick{position:absolute;top:-3px;width:2px;height:11px;background:var(--text);}
 
-  /* charts */
+  /* trend section (full width) */
+  .trend-section{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px;margin-bottom:22px;}
+  .trend-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:18px;}
+  .trend-head h2{font-size:22px;margin:0 0 4px;}
+  .trend-head .cardsub{font-size:13px;color:var(--dim);max-width:60ch;}
+  .seg-toggle{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;flex-shrink:0;}
+  .seg-toggle button{
+    background:var(--surface);border:none;color:var(--dim);padding:8px 18px;font-size:13px;font-weight:600;
+    cursor:pointer;font-family:'IBM Plex Sans',sans-serif;
+  }
+  .seg-toggle button.active{background:var(--accent-dark);color:#fff;}
+  .trend-chart-box{position:relative;height:380px;}
+
+  /* other charts */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px;}
   @media(max-width:920px){.grid{grid-template-columns:1fr;}}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;}
   .card h2{font-size:16px;font-weight:600;margin:0 0 2px;color:var(--text);}
   .card .cardsub{font-size:12px;color:var(--dim);margin-bottom:14px;}
   .card canvas{max-height:280px;}
+  .chart-box{position:relative;height:280px;}
   .toggle-row{display:flex;gap:6px;margin-bottom:12px;}
   .toggle-row button{
     background:var(--surface);border:1px solid var(--accent);color:var(--accent-dark);
@@ -125,64 +154,72 @@
   .pill.bad{background:rgba(179,69,47,.12);color:var(--warn);}
 
   .empty{color:var(--dim);font-size:13px;padding:40px;text-align:center;}
-  .hidden{display:none !important;}
 </style>
 </head>
 <body>
 <div class="topbar">
   <div class="topbar-inner">
-    <div class="eyebrow">M. Montesclaros Farms Inc. — Hatchery Operations</div>
-    <header>
-      <div>
-        <h1>Hatchery Performance</h1>
-        <p>Hatchability and chick-quality monitoring across cycles, customers, farms and breeds.</p>
-      </div>
-      <div class="meta">
-        <span><span class="dot"></span><span id="lastUpdated">No data loaded yet</span></span>
-        <span id="rowCount"></span>
-        <div class="source-bar">
-          <input id="csvUrl" type="text" class="hidden" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQhq9QzlZ8DgUdqqd2ZUzD_ZWAEh9xOz7T47Lw9i_rLhtKxB8YdXT1lDVeReoVbFi6kDuHvm8gsJ7si/pub?output=csv">
-          <button class="btn" id="loadBtn">Load data</button>
-          <button class="btn secondary" id="refreshBtn">Refresh</button>
-        </div>
-      </div>
-    </header>
-    <div class="status" id="statusMsg" style="margin-top:8px;"></div>
+    <div class="eyebrow">M. Montesclaros Farms Inc.</div>
+    <div class="hdiv"></div>
+    <h1>Hatchery Performance</h1>
+    <div class="live"><span class="dot"></span><span id="lastUpdated">Not loaded yet</span></div>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-actions">
+      <input id="csvUrl" type="text" class="hidden" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQhq9QzlZ8DgUdqqd2ZUzD_ZWAEh9xOz7T47Lw9i_rLhtKxB8YdXT1lDVeReoVbFi6kDuHvm8gsJ7si/pub?output=csv">
+      <button class="btn outline" id="loadBtn">Load data</button>
+      <button class="btn" id="refreshBtn">↻ Refresh data</button>
+    </div>
   </div>
+  <div class="status" id="statusMsg"></div>
 </div>
 
 <div class="wrap">
 
-  <div class="filters" id="filters"></div>
+  <div class="filterbar" id="filters"></div>
+  <div class="filter-summary" id="filterSummary"></div>
 
   <div class="kpis" id="kpis"></div>
 
-  <div class="grid">
-    <div class="card">
-      <h2>Hatchability &amp; clean chicks trend</h2>
-      <div class="cardsub">Averaged by hatch date across the current filter</div>
-      <canvas id="trendChart"></canvas>
+  <div class="trend-section">
+    <div class="trend-head">
+      <div>
+        <h2>Hatchability &amp; clean chicks trend</h2>
+        <div class="cardsub">Forecast-free trend of hatchability, clean chicks and breed standard, for the current filter. Weeks start Sunday.</div>
+      </div>
+      <div class="seg-toggle" id="trendGranularity">
+        <button data-g="weekly" class="active">Weekly</button>
+        <button data-g="monthly">Monthly</button>
+      </div>
     </div>
+    <div class="trend-chart-box"><canvas id="trendChart"></canvas></div>
+  </div>
+
+  <div class="grid">
     <div class="card">
       <h2>Actual vs. breed standard</h2>
       <div class="cardsub">Average % per breed against its own standard</div>
-      <canvas id="standardChart"></canvas>
+      <div class="chart-box"><canvas id="standardChart"></canvas></div>
     </div>
     <div class="card">
       <h2>Egg set composition</h2>
       <div class="cardsub">By cycle — clean chicks, sellable, penoy, pips, waste</div>
-      <canvas id="compositionChart"></canvas>
+      <div class="chart-box"><canvas id="compositionChart"></canvas></div>
     </div>
-    <div class="card">
-      <h2>Performance breakdown</h2>
-      <div class="toggle-row" id="breakdownToggle">
+  </div>
+
+  <div class="trend-section">
+    <div class="trend-head">
+      <div>
+        <h2>Performance breakdown</h2>
+        <div class="cardsub">Average hatchability % vs. breed standard</div>
+      </div>
+      <div class="seg-toggle" id="breakdownToggle">
         <button data-key="CUSTOMERS" class="active">By customer</button>
         <button data-key="FARM SOURCE">By farm</button>
         <button data-key="BREED">By breed</button>
       </div>
-      <div class="cardsub">Average hatchability % vs. breed standard</div>
-      <canvas id="breakdownChart"></canvas>
     </div>
+    <div class="trend-chart-box"><canvas id="breakdownChart"></canvas></div>
   </div>
 
   <div class="table-card">
@@ -261,8 +298,7 @@ async function loadCsv(url){
     const headers = parsed.meta.fields || [];
     colMap = buildColMap(headers);
     rawRows = parsed.data.filter(r => Object.values(r).some(v=>String(v).trim()!==''));
-    document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleString();
-    document.getElementById('rowCount').textContent = rawRows.length + ' records';
+    document.getElementById('lastUpdated').textContent = 'Live · updated ' + new Date().toLocaleTimeString();
     setStatus('Loaded ' + rawRows.length + ' rows', false);
     activeFilters = { CYCLE:new Set(), CUSTOMERS:new Set(), 'FARM SOURCE':new Set(), BREED:new Set() };
     renderFilters();
@@ -304,13 +340,20 @@ function renderFilters(){
   container.innerHTML = '';
   FILTER_KEYS.forEach(key=>{
     const values = uniqueValues(key);
+    const field = document.createElement('div');
+    field.className = 'filter-field';
+    const fname = document.createElement('div');
+    fname.className = 'fname';
+    fname.textContent = FILTER_LABELS[key];
+    field.appendChild(fname);
+
     const wrap = document.createElement('div');
     wrap.className = 'filter';
     wrap.id = 'filter-'+key.replace(/\s/g,'');
 
     const btn = document.createElement('button');
     const activeCount = activeFilters[key].size;
-    btn.innerHTML = FILTER_LABELS[key] + (activeCount ? ` <span class="count">${activeCount}</span>` : ' · All');
+    btn.innerHTML = `<span>${activeCount ? activeCount+' selected' : 'All '+FILTER_LABELS[key].toLowerCase()+'s'}</span>` + (activeCount ? ` <span class="count">${activeCount}</span>` : '');
     btn.onclick = (e)=>{
       e.stopPropagation();
       document.querySelectorAll('.filter').forEach(f=>{ if(f!==wrap) f.classList.remove('open'); });
@@ -345,8 +388,41 @@ function renderFilters(){
     });
 
     wrap.appendChild(panel);
-    container.appendChild(wrap);
+    field.appendChild(wrap);
+    container.appendChild(field);
   });
+
+  const clearField = document.createElement('div');
+  clearField.className = 'filter-field clear-filters';
+  clearField.innerHTML = '<div class="fname">&nbsp;</div>';
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'btn outline';
+  clearBtn.style.cssText = 'color:var(--accent-dark);border-color:var(--line);';
+  clearBtn.textContent = 'Clear filters';
+  clearBtn.onclick = ()=>{
+    FILTER_KEYS.forEach(k=>activeFilters[k].clear());
+    renderFilters(); renderAll();
+  };
+  clearField.appendChild(clearBtn);
+  container.appendChild(clearField);
+
+  renderFilterSummary();
+}
+
+function renderFilterSummary(){
+  const el = document.getElementById('filterSummary');
+  if(!el) return;
+  const parts = FILTER_KEYS.map(key=>{
+    const set = activeFilters[key];
+    if(!set.size) return 'all '+FILTER_LABELS[key].toLowerCase()+'s';
+    if(set.size===1) return Array.from(set)[0];
+    return set.size+' '+FILTER_LABELS[key].toLowerCase()+'s';
+  });
+  const rows = filteredRows();
+  const dates = rows.map(r=>parseDate(get(r,'DATE HATCH'))).filter(Boolean).sort((a,b)=>a-b);
+  const latest = dates.length ? dates[dates.length-1] : null;
+  el.textContent = parts.join(', ') + ': ' + rows.length + ' matched records' +
+    (latest ? '. Latest hatch date ' + latest.toLocaleDateString(undefined,{month:'short',day:'numeric',year: latest.getFullYear()!==2000?'numeric':undefined}) + '.' : '.');
 }
 
 document.addEventListener('click', ()=>{
@@ -367,19 +443,31 @@ function renderKpis(rows){
   const avgStdHatch = avg(rows.map(r=>getNum(r,'STD HATCHABILITY %')));
   const waste = sum(rows.map(r=>getNum(r,'WASTE')));
   const delta = avgHatchability - avgStdHatch;
+  const onTarget = !isNaN(delta) && delta>=0;
 
   const kpiData = [
     {label:'Total egg set', num: fmtInt(eggSet), sub:rows.length+' batches'},
     {label:'Total clean chicks', num: fmtInt(cleanChicks), sub: isNaN(cleanChicks/eggSet)?'':fmt1(cleanChicks/eggSet*100)+'% of egg set'},
-    {label:'Avg hatchability', num: fmt1(avgHatchability)+'%', sub: isNaN(delta)?'':((delta>=0?'+':'')+fmt1(delta)+' pts vs standard'), cls: isNaN(delta)?'':(delta>=0?'good':'bad')},
+    {label:'Avg hatchability', num: fmt1(avgHatchability)+'%',
+      sub: isNaN(delta)?'':((delta>=0?'+':'')+fmt1(delta)+' pts vs standard'), cls: isNaN(delta)?'':(onTarget?'good':'bad'),
+      pill: isNaN(delta)?null:(onTarget?'On target':'Below standard'),
+      bar: isNaN(avgHatchability)?null:{value:avgHatchability, target:avgStdHatch, bad:!onTarget}},
     {label:'Avg clean chicks %', num: fmt1(avgCleanPct)+'%', sub:'of fertile eggs'},
     {label:'Total waste', num: fmtInt(waste), sub: isNaN(waste/eggSet)?'':fmt1(waste/eggSet*100)+'% of egg set'},
   ];
   el.innerHTML = kpiData.map(k=>`
     <div class="kpi">
-      <div class="label">${k.label}</div>
+      <div class="kpi-top">
+        <div class="label">${k.label}</div>
+        ${k.pill?`<span class="kpi-pill ${k.cls}">${k.pill}</span>`:''}
+      </div>
       <div class="num">${k.num}</div>
       <div class="sub ${k.cls||''}">${k.sub||''}</div>
+      ${k.bar && !isNaN(k.bar.target) ? `
+        <div class="kpi-bar ${k.bar.bad?'bad':''}">
+          <div class="fill" style="width:${Math.min(100,k.bar.value)}%"></div>
+          <div class="tick" style="left:${Math.min(100,k.bar.target)}%"></div>
+        </div>` : ''}
     </div>`).join('');
 }
 
@@ -409,30 +497,59 @@ function parseDate(v){
   return null;
 }
 
+function weekKey(d){
+  // Sunday-anchored week start, used to smooth the trend line into weekly averages.
+  const dt = new Date(d);
+  const day = dt.getDay(); // 0 = Sunday
+  dt.setDate(dt.getDate()-day);
+  return dt.toISOString().slice(0,10);
+}
+
+function monthKey(d){
+  const dt = new Date(d);
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+}
+
+let trendGranularity = 'weekly';
+
 function renderTrendChart(rows){
   const withDates = rows.map(r=>({d:parseDate(get(r,'DATE HATCH')), r})).filter(x=>x.d);
   withDates.sort((a,b)=>a.d-b.d);
+  const keyFn = trendGranularity==='monthly' ? monthKey : weekKey;
   const grouped = {};
   withDates.forEach(({d,r})=>{
-    const key = d.toISOString().slice(0,10);
+    const key = keyFn(d);
     if(!grouped[key]) grouped[key]={hatch:[],clean:[],std:[]};
-    grouped[key].hatch.push(getNum(r,'HATCHABILITY %'));
-    grouped[key].clean.push(getNum(r,'CLEAN CHICKS %'));
-    grouped[key].std.push(getNum(r,'STD HATCHABILITY %'));
+    const h = getNum(r,'HATCHABILITY %'), c = getNum(r,'CLEAN CHICKS %'), s = getNum(r,'STD HATCHABILITY %');
+    // Exact 0 on a hatchability/clean-chicks reading is treated as an incomplete
+    // record (a batch still pending or missing data), not a genuine 0% outcome,
+    // so it's excluded rather than dragging the average down to the floor.
+    if(h>0) grouped[key].hatch.push(h);
+    if(c>0) grouped[key].clean.push(c);
+    if(s>0) grouped[key].std.push(s);
   });
   const labels = Object.keys(grouped).sort();
   const hatchData = labels.map(l=>avg(grouped[l].hatch));
   const cleanData = labels.map(l=>avg(grouped[l].clean));
   const stdData = labels.map(l=>avg(grouped[l].std));
 
+  const labelText = labels.map(l=>{
+    if(trendGranularity==='monthly'){
+      const [y,m] = l.split('-').map(Number);
+      return new Date(y, m-1, 1).toLocaleDateString(undefined,{month:'short', year: y!==2000?'numeric':undefined});
+    }
+    const d = new Date(l);
+    return 'Week of '+d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  });
+
   renderLineOrBar('trendChart','line',{
-    labels: labels.map(l=>new Date(l).toLocaleDateString(undefined,{month:'short',day:'numeric'})),
+    labels: labelText,
     datasets:[
-      {label:'Hatchability %', data:hatchData, borderColor:'#6B6F62', backgroundColor:'#6B6F62', tension:.3, pointRadius:2},
-      {label:'Clean chicks %', data:cleanData, borderColor:'#4B8A3F', backgroundColor:'#4B8A3F', tension:.3, pointRadius:2},
-      {label:'Breed standard %', data:stdData, borderColor:'#2E6BB3', backgroundColor:'#2E6BB3', borderDash:[5,4], tension:.3, pointRadius:0},
+      {label:'Hatchability %', data:hatchData, borderColor:'#6B6F62', backgroundColor:'#6B6F62', tension:.35, spanGaps:true},
+      {label:'Clean chicks %', data:cleanData, borderColor:'#4B8A3F', backgroundColor:'#4B8A3F', tension:.35, spanGaps:true},
+      {label:'Breed standard %', data:stdData, borderColor:'#2E6BB3', backgroundColor:'#2E6BB3', borderDash:[5,4], tension:.35, spanGaps:true, pointRadius:0, pointHoverRadius:0},
     ]
-  }, labels.length===0);
+  }, labels.length===0, false, {percent:true, hidePoints:true, maxTicksLimit: trendGranularity==='monthly'?12:10});
 }
 
 function renderStandardChart(rows){
@@ -450,7 +567,7 @@ function renderStandardChart(rows){
       {label:'Actual hatchability %', data:breeds.map(b=>avg(byBreed[b].hatch)), backgroundColor:'#6E7F2C'},
       {label:'Breed standard %', data:breeds.map(b=>avg(byBreed[b].std)), backgroundColor:'#C4C6B8'},
     ]
-  }, breeds.length===0);
+  }, breeds.length===0, false, {percent:true});
 }
 
 function renderCompositionChart(rows){
@@ -479,7 +596,7 @@ function renderCompositionChart(rows){
     datasets: seriesDefs.map(([label,key,color])=>({
       label, data: cycles.map(c=>byCycle[c][key]), backgroundColor:color, stack:'s'
     }))
-  }, cycles.length===0, true);
+  }, cycles.length===0, true, {});
 }
 
 function renderBreakdownChart(rows){
@@ -498,10 +615,11 @@ function renderBreakdownChart(rows){
       {label:'Avg hatchability %', data:labels.map(l=>avg(groups[l].hatch)), backgroundColor:'#6E7F2C'},
       {label:'Breed standard %', data:labels.map(l=>avg(groups[l].std)), backgroundColor:'#C4C6B8'},
     ]
-  }, labels.length===0);
+  }, labels.length===0, false, {percent:true});
 }
 
-function renderLineOrBar(canvasId, type, data, isEmpty, stacked){
+function renderLineOrBar(canvasId, type, data, isEmpty, stacked, opts){
+  opts = opts || {};
   const ctx = document.getElementById(canvasId);
   if(charts[canvasId]){ charts[canvasId].destroy(); charts[canvasId]=null; }
   if(typeof Chart === 'undefined'){
@@ -516,19 +634,41 @@ function renderLineOrBar(canvasId, type, data, isEmpty, stacked){
   if(isEmpty){
     return;
   }
+  const suffix = opts.percent ? '%' : '';
   charts[canvasId] = new Chart(ctx, {
     type,
     data,
     options:{
       responsive:true,
-      maintainAspectRatio:true,
+      maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
+      elements:{
+        line:{borderWidth:2},
+        point:{radius: opts.hidePoints ? 0 : 2, hoverRadius:5, hitRadius:8},
+      },
       plugins:{
-        legend:{labels:{color:'#6B6F62',font:{family:'IBM Plex Sans',size:11}}},
+        legend:{
+          position:'top',
+          labels:{color:'#6B6F62', usePointStyle:true, pointStyle:'line', boxWidth:24, padding:16, font:{family:'IBM Plex Sans',size:11}}
+        },
+        tooltip:{
+          backgroundColor:'#1A1B16', titleColor:'#fff', bodyColor:'#F0F0EA',
+          padding:10, boxPadding:4, cornerRadius:6,
+          callbacks: suffix ? { label:(ctx2)=> `${ctx2.dataset.label}: ${ctx2.parsed.y==null?'—':ctx2.parsed.y.toFixed(1)+suffix}` } : undefined
+        }
       },
       scales:{
-        x:{ stacked: !!stacked, ticks:{color:'#6B6F62',font:{size:10}}, grid:{color:'#E1E2D9'} },
-        y:{ stacked: !!stacked, ticks:{color:'#6B6F62',font:{size:10}}, grid:{color:'#E1E2D9'} },
+        x:{
+          stacked: !!stacked,
+          ticks:{color:'#6B6F62', font:{size:10}, autoSkip:true, maxTicksLimit: opts.maxTicksLimit||9, maxRotation:0, minRotation:0},
+          grid:{color:'#EDEEE7', drawTicks:false}
+        },
+        y:{
+          stacked: !!stacked,
+          suggestedMax: opts.percent ? 100 : undefined,
+          ticks:{color:'#6B6F62', font:{size:10}, callback:(v)=> suffix ? v+suffix : v},
+          grid:{color:'#EDEEE7', drawTicks:false}
+        },
       }
     }
   });
@@ -568,6 +708,14 @@ function renderAll(){
   safeRender(renderBreakdownChart, rows);
   safeRender(renderTable, rows);
 }
+
+document.getElementById('trendGranularity').addEventListener('click', (e)=>{
+  if(e.target.tagName!=='BUTTON') return;
+  document.querySelectorAll('#trendGranularity button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  trendGranularity = e.target.dataset.g;
+  renderTrendChart(filteredRows());
+});
 
 document.getElementById('breakdownToggle').addEventListener('click', (e)=>{
   if(e.target.tagName!=='BUTTON') return;
