@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Hatchery Performance</title>
+<title>Hatching Eggs Performance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -40,7 +40,7 @@
     display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   }
   .eyebrow{
-    color:var(--header-line);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--header-line);font-size:18px;letter-spacing:1.5px;text-transform:uppercase;
     font-weight:600;font-family:'IBM Plex Sans',sans-serif;white-space:nowrap;
   }
   .hdiv{width:1px;height:18px;background:#3A3D33;}
@@ -94,7 +94,7 @@
   .filter-summary{font-size:12.5px;color:var(--dim);padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:22px;}
 
   /* KPIs */
-  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:26px;}
+  .kpis{display:grid;grid-template-columns:0.5fr 1fr 1fr 1fr 1fr;gap:14px;margin-bottom:26px;}
   @media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr);}}
   .kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;}
   .kpi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
@@ -161,12 +161,11 @@
   <div class="topbar-inner">
     <div class="eyebrow">M. Montesclaros Farms Inc.</div>
     <div class="hdiv"></div>
-    <h1>Hatchery Performance</h1>
-    <div class="live"><span class="dot"></span><span id="lastUpdated">Not loaded yet</span></div>
+    <h1>Hatching Eggs Performance</h1>
+    <div class="live"><span class="dot"></span><span id="lastUpdated">Live from Google Sheet</span></div>
     <div class="topbar-spacer"></div>
     <div class="topbar-actions">
       <input id="csvUrl" type="text" class="hidden" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQhq9QzlZ8DgUdqqd2ZUzD_ZWAEh9xOz7T47Lw9i_rLhtKxB8YdXT1lDVeReoVbFi6kDuHvm8gsJ7si/pub?output=csv">
-      <button class="btn outline" id="loadBtn">Load data</button>
       <button class="btn" id="refreshBtn">↻ Refresh data</button>
     </div>
   </div>
@@ -298,8 +297,8 @@ async function loadCsv(url){
     const headers = parsed.meta.fields || [];
     colMap = buildColMap(headers);
     rawRows = parsed.data.filter(r => Object.values(r).some(v=>String(v).trim()!==''));
-    document.getElementById('lastUpdated').textContent = 'Live · updated ' + new Date().toLocaleTimeString();
-    setStatus('Loaded ' + rawRows.length + ' rows', false);
+    document.getElementById('lastUpdated').textContent = 'Live from Google Sheet · updated ' + new Date().toLocaleTimeString();
+    setStatus('', false);
     activeFilters = { CYCLE:new Set(), CUSTOMERS:new Set(), 'FARM SOURCE':new Set(), BREED:new Set() };
     renderFilters();
     renderAll();
@@ -725,11 +724,6 @@ document.getElementById('breakdownToggle').addEventListener('click', (e)=>{
   renderBreakdownChart(filteredRows());
 });
 
-document.getElementById('loadBtn').addEventListener('click', ()=>{
-  const url = document.getElementById('csvUrl').value.trim();
-  if(!url){ setStatus('Paste your published CSV link first', true); return; }
-  loadCsv(url);
-});
 document.getElementById('refreshBtn').addEventListener('click', ()=>{
   const url = document.getElementById('csvUrl').value.trim();
   if(!url){ setStatus('Load a data source first', true); return; }
