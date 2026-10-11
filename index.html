@@ -35,6 +35,10 @@
 
   /* header */
   .topbar{background:var(--header-bg);border-bottom:3px solid var(--header-line);margin-bottom:22px;position:sticky;top:0;z-index:100;}
+  .filterbar-sticky{
+    position:sticky; top:var(--topbar-h,64px); z-index:90;
+    background:var(--bg); border-bottom:1px solid var(--line);
+  }
   .topbar-inner{
     max-width:1400px;margin:0 auto;padding:12px 28px;
     display:flex;align-items:center;gap:14px;flex-wrap:wrap;
@@ -177,10 +181,14 @@
   <div class="status" id="statusMsg"></div>
 </div>
 
-<div class="wrap">
+<div class="filterbar-sticky">
+  <div class="wrap">
+    <div class="filterbar" id="filters"></div>
+    <div class="filter-summary" id="filterSummary"></div>
+  </div>
+</div>
 
-  <div class="filterbar" id="filters"></div>
-  <div class="filter-summary" id="filterSummary"></div>
+<div class="wrap">
 
   <div class="kpis" id="kpis"></div>
 
@@ -749,6 +757,16 @@ document.getElementById('refreshBtn').addEventListener('click', ()=>{
   if(!url){ setStatus('Load a data source first', true); return; }
   loadCsv(url + (url.includes('?')?'&':'?') + '_ts=' + Date.now());
 });
+
+function syncTopbarHeight(){
+  const h = document.querySelector('.topbar').getBoundingClientRect().height;
+  document.documentElement.style.setProperty('--topbar-h', h+'px');
+}
+syncTopbarHeight();
+window.addEventListener('resize', syncTopbarHeight);
+// The status line under the header can appear/disappear, changing header height;
+// re-measure whenever it does so the filter bar stays pinned right beneath it.
+new MutationObserver(syncTopbarHeight).observe(document.getElementById('statusMsg'), {childList:true, characterData:true, subtree:true});
 
 (async function init(){
   try{
