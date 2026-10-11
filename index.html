@@ -117,6 +117,10 @@
   .trend-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:18px;}
   .trend-head h2{font-size:22px;margin:0 0 4px;}
   .trend-head .cardsub{font-size:13px;color:var(--dim);max-width:60ch;}
+  .trend-controls{display:flex;flex-direction:column;align-items:flex-end;gap:0;flex-shrink:0;}
+  .trend-controls .filterbar{padding:0;flex-wrap:nowrap;}
+  .trend-controls .filter-field{min-width:160px;}
+  .trend-controls .filter > button{min-width:160px;}
   .seg-toggle{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;flex-shrink:0;}
   .seg-toggle button{
     background:var(--surface);border:none;color:var(--dim);padding:8px 18px;font-size:13px;font-weight:600;
@@ -186,9 +190,12 @@
         <h2>Hatchability &amp; clean chicks trend</h2>
         <div class="cardsub">Forecast-free trend of hatchability, clean chicks and breed standard, for the current filter. Weeks start Sunday.</div>
       </div>
-      <div class="seg-toggle" id="trendGranularity">
-        <button data-g="weekly" class="active">Weekly</button>
-        <button data-g="monthly">Monthly</button>
+      <div class="trend-controls">
+        <div class="filterbar" id="trendCycleFilter" style="margin-bottom:8px;"></div>
+        <div class="seg-toggle" id="trendGranularity">
+          <button data-g="weekly" class="active">Weekly</button>
+          <button data-g="monthly">Monthly</button>
+        </div>
       </div>
     </div>
     <div class="trend-chart-box"><canvas id="trendChart"></canvas></div>
@@ -335,61 +342,67 @@ function filteredRows(){
   });
 }
 
+function buildFilterField(key){
+  const values = uniqueValues(key);
+  const field = document.createElement('div');
+  field.className = 'filter-field';
+  const fname = document.createElement('div');
+  fname.className = 'fname';
+  fname.textContent = FILTER_LABELS[key];
+  field.appendChild(fname);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'filter';
+  wrap.id = 'filter-'+key.replace(/\s/g,'');
+
+  const btn = document.createElement('button');
+  const activeCount = activeFilters[key].size;
+  btn.innerHTML = `<span>${activeCount ? activeCount+' selected' : 'All '+FILTER_LABELS[key].toLowerCase()+'s'}</span>` + (activeCount ? ` <span class="count">${activeCount}</span>` : '');
+  btn.onclick = (e)=>{
+    e.stopPropagation();
+    document.querySelectorAll('.filter').forEach(f=>{ if(f!==wrap) f.classList.remove('open'); });
+    wrap.classList.toggle('open');
+  };
+  wrap.appendChild(btn);
+
+  const panel = document.createElement('div');
+  panel.className = 'filter-panel';
+
+  const actions = document.createElement('div');
+  actions.className = 'fp-actions';
+  const clearA = document.createElement('a'); clearA.textContent='Clear';
+  clearA.onclick=()=>{ activeFilters[key].clear(); renderFilters(); renderAll(); };
+  const allA = document.createElement('a'); allA.textContent='Select all';
+  allA.onclick=()=>{ values.forEach(v=>activeFilters[key].add(v)); renderFilters(); renderAll(); };
+  actions.appendChild(clearA); actions.appendChild(allA);
+  panel.appendChild(actions);
+
+  values.forEach(v=>{
+    const label = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type='checkbox';
+    cb.checked = activeFilters[key].has(v);
+    cb.onchange = ()=>{
+      if(cb.checked) activeFilters[key].add(v); else activeFilters[key].delete(v);
+      renderFilters(); renderAll();
+    };
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(v));
+    panel.appendChild(label);
+  });
+
+  wrap.appendChild(panel);
+  field.appendChild(wrap);
+  return field;
+}
+
 function renderFilters(){
+  // Cycle lives inside the trend panel (above the Weekly/Monthly toggle);
+  // the rest sit in the main filter bar.
   const container = document.getElementById('filters');
   container.innerHTML = '';
-  FILTER_KEYS.forEach(key=>{
-    const values = uniqueValues(key);
-    const field = document.createElement('div');
-    field.className = 'filter-field';
-    const fname = document.createElement('div');
-    fname.className = 'fname';
-    fname.textContent = FILTER_LABELS[key];
-    field.appendChild(fname);
-
-    const wrap = document.createElement('div');
-    wrap.className = 'filter';
-    wrap.id = 'filter-'+key.replace(/\s/g,'');
-
-    const btn = document.createElement('button');
-    const activeCount = activeFilters[key].size;
-    btn.innerHTML = `<span>${activeCount ? activeCount+' selected' : 'All '+FILTER_LABELS[key].toLowerCase()+'s'}</span>` + (activeCount ? ` <span class="count">${activeCount}</span>` : '');
-    btn.onclick = (e)=>{
-      e.stopPropagation();
-      document.querySelectorAll('.filter').forEach(f=>{ if(f!==wrap) f.classList.remove('open'); });
-      wrap.classList.toggle('open');
-    };
-    wrap.appendChild(btn);
-
-    const panel = document.createElement('div');
-    panel.className = 'filter-panel';
-
-    const actions = document.createElement('div');
-    actions.className = 'fp-actions';
-    const clearA = document.createElement('a'); clearA.textContent='Clear';
-    clearA.onclick=()=>{ activeFilters[key].clear(); renderFilters(); renderAll(); };
-    const allA = document.createElement('a'); allA.textContent='Select all';
-    allA.onclick=()=>{ values.forEach(v=>activeFilters[key].add(v)); renderFilters(); renderAll(); };
-    actions.appendChild(clearA); actions.appendChild(allA);
-    panel.appendChild(actions);
-
-    values.forEach(v=>{
-      const label = document.createElement('label');
-      const cb = document.createElement('input');
-      cb.type='checkbox';
-      cb.checked = activeFilters[key].has(v);
-      cb.onchange = ()=>{
-        if(cb.checked) activeFilters[key].add(v); else activeFilters[key].delete(v);
-        renderFilters(); renderAll();
-      };
-      label.appendChild(cb);
-      label.appendChild(document.createTextNode(v));
-      panel.appendChild(label);
-    });
-
-    wrap.appendChild(panel);
-    field.appendChild(wrap);
-    container.appendChild(field);
+  FILTER_KEYS.filter(k=>k!=='CYCLE').forEach(key=>{
+    container.appendChild(buildFilterField(key));
   });
 
   const clearField = document.createElement('div');
@@ -405,6 +418,12 @@ function renderFilters(){
   };
   clearField.appendChild(clearBtn);
   container.appendChild(clearField);
+
+  const cycleContainer = document.getElementById('trendCycleFilter');
+  if(cycleContainer){
+    cycleContainer.innerHTML = '';
+    cycleContainer.appendChild(buildFilterField('CYCLE'));
+  }
 
   renderFilterSummary();
 }
