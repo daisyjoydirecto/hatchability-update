@@ -34,13 +34,13 @@
   .wrap{max-width:1400px;margin:0 auto;padding:0 28px 80px;}
 
   /* header */
-  .topbar{background:var(--header-bg);border-bottom:3px solid var(--header-line);margin-bottom:22px;position:sticky;top:0;z-index:100;}
+  .topbar{background:var(--header-bg);border-bottom:3px solid var(--header-line);margin-bottom:0;position:sticky;top:0;z-index:100;}
   .filterbar-sticky{
     position:sticky; top:var(--topbar-h,64px); z-index:90;
     background:var(--bg); border-bottom:1px solid var(--line);
   }
   .topbar-inner{
-    max-width:1400px;margin:0 auto;padding:12px 28px;
+    max-width:1400px;margin:0 auto;padding:9px 28px;
     display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   }
   .eyebrow{
@@ -68,7 +68,7 @@
   /* filter bar */
   .filterbar{
     display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-    padding:18px 0 14px;
+    padding:10px 0 8px;
   }
   .filter-field{display:flex;flex-direction:column;gap:0;min-width:0;}
   .filter-field > .fname{display:none;}
@@ -98,10 +98,10 @@
   .filter-panel .fp-actions{display:flex;justify-content:space-between;padding:4px 6px 8px;border-bottom:1px solid var(--line);margin-bottom:6px;}
   .filter-panel .fp-actions a{color:var(--accent-dark);font-size:11px;cursor:pointer;text-decoration:none;font-weight:600;}
   .clear-filters{margin-left:auto;}
-  .filter-summary{font-size:12.5px;color:var(--dim);padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:22px;}
+  .filter-summary{font-size:12.5px;color:var(--dim);padding-bottom:8px;}
 
   /* KPIs */
-  .kpis{display:grid;grid-template-columns:0.5fr 1fr 1fr 1fr 1fr;gap:10px;margin-bottom:18px;}
+  .kpis{display:grid;grid-template-columns:0.5fr 1fr 1fr 1fr 1fr;gap:10px;margin:14px 0;}
   @media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr);}}
   .kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;}
   .kpi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
@@ -119,7 +119,7 @@
   .kpi-bar .tick{position:absolute;top:-2px;width:2px;height:8px;background:var(--text);}
 
   /* trend section (full width) */
-  .trend-section{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px;margin-bottom:22px;}
+  .trend-section{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:16px;}
   .trend-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:18px;}
   .trend-head h2{font-size:22px;margin:0 0 4px;}
   .trend-head .cardsub{font-size:13px;color:var(--dim);max-width:60ch;}
