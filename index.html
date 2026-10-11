@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Hatching Eggs Performance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
@@ -27,10 +27,10 @@
     margin:0;
     background:var(--bg);
     color:var(--text);
-    font-family:'IBM Plex Sans',sans-serif;
+    font-family:'Century Gothic','Poppins',sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  h1,h2,.num{font-family:'Fraunces',serif;}
+  h1,h2,.num{font-family:'Century Gothic','Poppins',sans-serif;}
   .wrap{max-width:1400px;margin:0 auto;padding:0 28px 80px;}
 
   /* header */
@@ -41,7 +41,7 @@
   }
   .eyebrow{
     color:var(--header-line);font-size:18px;letter-spacing:1.5px;text-transform:uppercase;
-    font-weight:600;font-family:'IBM Plex Sans',sans-serif;white-space:nowrap;
+    font-weight:600;font-family:'Century Gothic','Poppins',sans-serif;white-space:nowrap;
   }
   .hdiv{width:1px;height:18px;background:#3A3D33;}
   .topbar h1{font-size:18px;font-weight:600;margin:0;letter-spacing:.2px;color:#FFFFFF;white-space:nowrap;}
@@ -52,7 +52,7 @@
 
   .btn{
     background:var(--accent-dark);color:#FFFFFF;border:1px solid var(--accent-dark);padding:8px 16px;border-radius:6px;
-    font-size:13px;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;white-space:nowrap;
+    font-size:13px;font-weight:600;cursor:pointer;font-family:'Century Gothic','Poppins',sans-serif;white-space:nowrap;
   }
   .btn.outline{background:transparent;color:var(--header-line);border:1px solid var(--header-line);}
   .btn:hover{filter:brightness(1.15);}
@@ -63,21 +63,23 @@
 
   /* filter bar */
   .filterbar{
-    display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
     padding:18px 0 14px;
   }
-  .filter-field{display:flex;flex-direction:column;gap:6px;min-width:180px;}
-  .filter-field > .fname{font-size:12px;color:var(--dim);}
+  .filter-field{display:flex;flex-direction:column;gap:0;min-width:0;}
+  .filter-field > .fname{display:none;}
   .filter{position:relative;}
   .filter > button{
-    background:var(--surface);border:1px solid var(--line);color:var(--text);
-    padding:9px 12px;border-radius:7px;font-size:13px;cursor:pointer;font-weight:500;
-    display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:180px;
-    font-family:'IBM Plex Sans',sans-serif;
+    background:var(--surface);border:1.5px solid var(--accent);color:var(--accent-dark);
+    padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;font-weight:600;
+    display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;white-space:nowrap;
+    font-family:'Century Gothic','Poppins',sans-serif;
   }
-  .filter > button:after{content:'▾';color:var(--dim);font-size:11px;}
-  .filter > button:hover{border-color:var(--accent);}
-  .filter .count{background:var(--accent-dark);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;}
+  .filter > button:after{content:'▾';font-size:9px;opacity:.7;}
+  .filter > button:hover{background:rgba(110,127,44,.08);}
+  .filter.has-selection > button{background:var(--accent-dark);border-color:var(--accent-dark);color:#fff;}
+  .filter.has-selection > button:hover{filter:brightness(1.1);}
+  .filter .count{background:#fff;color:var(--accent-dark);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;}
   .filter-panel{
     display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:20;
     background:var(--surface);border:1px solid var(--line);border-radius:10px;
@@ -119,12 +121,10 @@
   .trend-head .cardsub{font-size:13px;color:var(--dim);max-width:60ch;}
   .trend-controls{display:flex;flex-direction:column;align-items:flex-end;gap:0;flex-shrink:0;}
   .trend-controls .filterbar{padding:0;flex-wrap:nowrap;}
-  .trend-controls .filter-field{min-width:160px;}
-  .trend-controls .filter > button{min-width:160px;}
   .seg-toggle{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;flex-shrink:0;}
   .seg-toggle button{
     background:var(--surface);border:none;color:var(--dim);padding:8px 18px;font-size:13px;font-weight:600;
-    cursor:pointer;font-family:'IBM Plex Sans',sans-serif;
+    cursor:pointer;font-family:'Century Gothic','Poppins',sans-serif;
   }
   .seg-toggle button.active{background:var(--accent-dark);color:#fff;}
   .trend-chart-box{position:relative;height:380px;}
@@ -351,13 +351,13 @@ function buildFilterField(key){
   fname.textContent = FILTER_LABELS[key];
   field.appendChild(fname);
 
+  const activeCount = activeFilters[key].size;
   const wrap = document.createElement('div');
-  wrap.className = 'filter';
+  wrap.className = 'filter' + (activeCount ? ' has-selection' : '');
   wrap.id = 'filter-'+key.replace(/\s/g,'');
 
   const btn = document.createElement('button');
-  const activeCount = activeFilters[key].size;
-  btn.innerHTML = `<span>${activeCount ? activeCount+' selected' : 'All '+FILTER_LABELS[key].toLowerCase()+'s'}</span>` + (activeCount ? ` <span class="count">${activeCount}</span>` : '');
+  btn.innerHTML = `<span>${FILTER_LABELS[key]}</span>` + (activeCount ? ` <span class="count">${activeCount}</span>` : '');
   btn.onclick = (e)=>{
     e.stopPropagation();
     document.querySelectorAll('.filter').forEach(f=>{ if(f!==wrap) f.classList.remove('open'); });
@@ -668,7 +668,7 @@ function renderLineOrBar(canvasId, type, data, isEmpty, stacked, opts){
       plugins:{
         legend:{
           position:'top',
-          labels:{color:'#6B6F62', usePointStyle:true, pointStyle:'line', boxWidth:24, padding:16, font:{family:'IBM Plex Sans',size:11}}
+          labels:{color:'#6B6F62', usePointStyle:true, pointStyle:'line', boxWidth:24, padding:16, font:{family:"'Century Gothic','Poppins',sans-serif",size:11}}
         },
         tooltip:{
           backgroundColor:'#1A1B16', titleColor:'#fff', bodyColor:'#F0F0EA',
@@ -679,13 +679,13 @@ function renderLineOrBar(canvasId, type, data, isEmpty, stacked, opts){
       scales:{
         x:{
           stacked: !!stacked,
-          ticks:{color:'#6B6F62', font:{size:10}, autoSkip:true, maxTicksLimit: opts.maxTicksLimit||9, maxRotation:0, minRotation:0},
+          ticks:{color:'#6B6F62', font:{size:10, family:"'Century Gothic','Poppins',sans-serif"}, autoSkip:true, maxTicksLimit: opts.maxTicksLimit||9, maxRotation:0, minRotation:0},
           grid:{color:'#EDEEE7', drawTicks:false}
         },
         y:{
           stacked: !!stacked,
           suggestedMax: opts.percent ? 100 : undefined,
-          ticks:{color:'#6B6F62', font:{size:10}, callback:(v)=> suffix ? v+suffix : v},
+          ticks:{color:'#6B6F62', font:{size:10, family:"'Century Gothic','Poppins',sans-serif"}, callback:(v)=> suffix ? v+suffix : v},
           grid:{color:'#EDEEE7', drawTicks:false}
         },
       }
